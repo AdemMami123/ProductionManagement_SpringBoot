@@ -1,0 +1,73 @@
+<mat-card>
+  <mat-card-header>
+    <mat-card-title>Liste des machines</mat-card-title>
+  </mat-card-header>
+  
+  <mat-card-content>
+    <div class="button-container">
+      <button mat-raised-button color="primary" [routerLink]="['/machines/new']">
+        <mat-icon>add</mat-icon> Nouvelle Machine
+      </button>
+    </div>
+
+    <div *ngIf="loading" class="loading-container">
+      <mat-spinner diameter="40"></mat-spinner>
+    </div>
+
+    <div *ngIf="errorMessage" class="error-message">
+      {{ errorMessage }}
+    </div>
+
+    <table mat-table [dataSource]="machines" *ngIf="!loading && !errorMessage">
+      <!-- ID Column -->
+      <ng-container matColumnDef="id">
+        <th mat-header-cell *matHeaderCellDef> ID </th>
+        <td mat-cell *matCellDef="let machine"> {{machine.id}} </td>
+      </ng-container>
+
+      <!-- Nom Column -->
+      <ng-container matColumnDef="nom">
+        <th mat-header-cell *matHeaderCellDef> Nom </th>
+        <td mat-cell *matCellDef="let machine"> {{machine.nom}} </td>
+      </ng-container>
+
+      <!-- Etat Column -->
+      <ng-container matColumnDef="etat">
+        <th mat-header-cell *matHeaderCellDef> État </th>
+        <td mat-cell *matCellDef="let machine"> 
+          <span class="etat-chip" [ngClass]="getEtatClass(machine.etat)">
+            {{machine.etat === 'EN_SERVICE' ? 'En service' : 
+              machine.etat === 'EN_PANNE' ? 'En panne' : 
+              machine.etat === 'EN_MAINTENANCE' ? 'En maintenance' : machine.etat}}
+          </span>
+        </td>
+      </ng-container>
+
+      <!-- Maintenance Prochaine Column -->
+      <ng-container matColumnDef="maintenanceProchaine">
+        <th mat-header-cell *matHeaderCellDef> Prochaine maintenance </th>
+        <td mat-cell *matCellDef="let machine"> {{machine.maintenanceProchaine | date:'dd/MM/yyyy'}} </td>
+      </ng-container>
+
+      <!-- Actions Column -->
+      <ng-container matColumnDef="actions">
+        <th mat-header-cell *matHeaderCellDef> Actions </th>
+        <td mat-cell *matCellDef="let machine">
+          <button mat-icon-button color="primary" (click)="editMachine(machine.id)">
+            <mat-icon>edit</mat-icon>
+          </button>
+          <button mat-icon-button color="warn" (click)="deleteMachine(machine.id)">
+            <mat-icon>delete</mat-icon>
+          </button>
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+    </table>
+
+    <div class="no-data" *ngIf="!loading && !errorMessage && machines.length === 0">
+      Aucune machine trouvée
+    </div>
+  </mat-card-content>
+</mat-card>

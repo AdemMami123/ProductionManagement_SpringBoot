@@ -1,0 +1,60 @@
+<mat-card>
+  <mat-card-header>
+    <mat-card-title>{{ isEditMode ? 'Modifier' : 'Ajouter' }} un produit</mat-card-title>
+  </mat-card-header>
+  
+  <mat-card-content>
+    <div *ngIf="loading" class="loading-container">
+      <mat-spinner diameter="40"></mat-spinner>
+    </div>
+
+    <div *ngIf="errorMessage" class="error-message">
+      {{ errorMessage }}
+    </div>
+
+    <form [formGroup]="produitForm" (ngSubmit)="onSubmit()" *ngIf="!loading">
+      <mat-form-field appearance="fill" class="full-width">
+        <mat-label>Nom</mat-label>
+        <input matInput formControlName="nom" required>
+        <mat-error *ngIf="produitForm.get('nom')?.hasError('required')">
+          Le nom est requis
+        </mat-error>
+      </mat-form-field>
+
+      <mat-form-field appearance="fill" class="full-width">
+        <mat-label>Type</mat-label>
+        <input matInput formControlName="type" required>
+        <mat-error *ngIf="produitForm.get('type')?.hasError('required')">
+          Le type est requis
+        </mat-error>
+      </mat-form-field>
+
+      <mat-form-field appearance="fill" class="full-width">
+        <mat-label>Stock</mat-label>
+        <input matInput type="number" formControlName="stock" required>
+        <mat-error *ngIf="produitForm.get('stock')?.hasError('required')">
+          Le stock est requis
+        </mat-error>
+        <mat-error *ngIf="produitForm.get('stock')?.hasError('min')">
+          Le stock ne peut pas être négatif
+        </mat-error>
+      </mat-form-field>
+
+      <mat-form-field appearance="fill" class="full-width">
+        <mat-label>Fournisseur</mat-label>
+        <input matInput formControlName="fournisseur" required>
+        <mat-error *ngIf="produitForm.get('fournisseur')?.hasError('required')">
+          Le fournisseur est requis
+        </mat-error>
+      </mat-form-field>
+
+      <div class="button-container">
+        <button mat-raised-button color="primary" type="submit" [disabled]="produitForm.invalid || submitLoading">
+          <span *ngIf="!submitLoading">Enregistrer</span>
+          <mat-spinner diameter="20" *ngIf="submitLoading"></mat-spinner>
+        </button>
+        <button mat-button type="button" (click)="cancel()">Annuler</button>
+      </div>
+    </form>
+  </mat-card-content>
+</mat-card>

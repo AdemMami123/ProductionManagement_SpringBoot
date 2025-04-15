@@ -1,0 +1,53 @@
+<mat-card>
+  <mat-card-header>
+    <mat-card-title>{{ isEditMode ? 'Modifier' : 'Ajouter' }} un technicien</mat-card-title>
+  </mat-card-header>
+  
+  <mat-card-content>
+    <div *ngIf="loading" class="loading-container">
+      <mat-spinner diameter="40"></mat-spinner>
+    </div>
+
+    <div *ngIf="errorMessage" class="error-message">
+      {{ errorMessage }}
+    </div>
+
+    <form [formGroup]="technicienForm" (ngSubmit)="onSubmit()" *ngIf="!loading">
+      <mat-form-field appearance="fill" class="full-width">
+        <mat-label>Nom</mat-label>
+        <input matInput formControlName="nom" required>
+        <mat-error *ngIf="technicienForm.get('nom')?.hasError('required')">
+          Le nom est requis
+        </mat-error>
+      </mat-form-field>
+
+      <mat-form-field appearance="fill" class="full-width">
+        <mat-label>Compétences</mat-label>
+        <textarea matInput formControlName="competences" required rows="3"></textarea>
+        <mat-error *ngIf="technicienForm.get('competences')?.hasError('required')">
+          Les compétences sont requises
+        </mat-error>
+      </mat-form-field>
+
+      <mat-form-field appearance="fill" class="full-width">
+        <mat-label>Machine assignée</mat-label>
+        <mat-select formControlName="machineAssignee">
+          <mat-option>Aucune</mat-option>
+          <mat-option *ngFor="let machine of machines" [value]="machine.id">
+            {{ machine.nom }}
+          </mat-option>
+        </mat-select>
+        <mat-progress-spinner *ngIf="machinesLoading" diameter="20" mode="indeterminate" 
+                              class="select-spinner"></mat-progress-spinner>
+      </mat-form-field>
+
+      <div class="button-container">
+        <button mat-raised-button color="primary" type="submit" [disabled]="technicienForm.invalid || submitLoading">
+          <span *ngIf="!submitLoading">Enregistrer</span>
+          <mat-spinner diameter="20" *ngIf="submitLoading"></mat-spinner>
+        </button>
+        <button mat-button type="button" (click)="cancel()">Annuler</button>
+      </div>
+    </form>
+  </mat-card-content>
+</mat-card>

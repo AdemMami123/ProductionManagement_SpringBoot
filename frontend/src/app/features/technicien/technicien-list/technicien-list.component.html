@@ -1,0 +1,77 @@
+<mat-card>
+  <mat-card-header>
+    <mat-card-title>Liste des techniciens</mat-card-title>
+  </mat-card-header>
+  
+  <mat-card-content>
+    <div class="button-container">
+      <button mat-raised-button color="primary" [routerLink]="['/techniciens/new']">
+        <mat-icon>add</mat-icon> Nouveau Technicien
+      </button>
+    </div>
+
+    <div *ngIf="loading" class="loading-container">
+      <mat-spinner diameter="40"></mat-spinner>
+    </div>
+
+    <div *ngIf="errorMessage" class="error-message">
+      {{ errorMessage }}
+    </div>
+
+    <table mat-table [dataSource]="techniciens" *ngIf="!loading && !errorMessage">
+      <!-- ID Column -->
+      <ng-container matColumnDef="id">
+        <th mat-header-cell *matHeaderCellDef> ID </th>
+        <td mat-cell *matCellDef="let technicien"> {{technicien.id}} </td>
+      </ng-container>
+
+      <!-- Nom Column -->
+      <ng-container matColumnDef="nom">
+        <th mat-header-cell *matHeaderCellDef> Nom </th>
+        <td mat-cell *matCellDef="let technicien"> {{technicien.nom}} </td>
+      </ng-container>
+
+      <!-- Compétences Column -->
+      <ng-container matColumnDef="competences">
+        <th mat-header-cell *matHeaderCellDef> Compétences </th>
+        <td mat-cell *matCellDef="let technicien"> {{technicien.competences}} </td>
+      </ng-container>
+
+      <!-- Machine Assignée Column -->
+      <ng-container matColumnDef="machineAssignee">
+        <th mat-header-cell *matHeaderCellDef> Machine assignée </th>
+        <td mat-cell *matCellDef="let technicien"> 
+          <span *ngIf="technicien.machineAssignee" class="machine-chip">
+            {{technicien.machineAssignee}}
+          </span>
+          <span *ngIf="!technicien.machineAssignee" class="no-machine">
+            Non assigné
+          </span>
+        </td>
+      </ng-container>
+
+      <!-- Actions Column -->
+      <ng-container matColumnDef="actions">
+        <th mat-header-cell *matHeaderCellDef> Actions </th>
+        <td mat-cell *matCellDef="let technicien">
+          <button mat-icon-button color="primary" (click)="editTechnicien(technicien.id)">
+            <mat-icon>edit</mat-icon>
+          </button>
+          <button mat-icon-button color="accent" (click)="assignToMachine(technicien.id)" matTooltip="Assigner à une machine">
+            <mat-icon>build</mat-icon>
+          </button>
+          <button mat-icon-button color="warn" (click)="deleteTechnicien(technicien.id)">
+            <mat-icon>delete</mat-icon>
+          </button>
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+    </table>
+
+    <div class="no-data" *ngIf="!loading && !errorMessage && techniciens.length === 0">
+      Aucun technicien trouvé
+    </div>
+  </mat-card-content>
+</mat-card>

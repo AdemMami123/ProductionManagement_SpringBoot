@@ -30,7 +30,3 @@ public class OrdreFabrication {
     @Enumerated(EnumType.STRING)
     private StatutOrdreFabrication statut;
 }
-
-enum StatutOrdreFabrication {
-    EN_ATTENTE, EN_COURS, TERMINE, ANNULE
-}

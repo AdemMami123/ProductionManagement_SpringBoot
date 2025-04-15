@@ -1,0 +1,77 @@
+<mat-card>
+  <mat-card-header>
+    <mat-card-title>Liste des maintenances</mat-card-title>
+  </mat-card-header>
+  
+  <mat-card-content>
+    <div class="button-container">
+      <button mat-raised-button color="primary" [routerLink]="['/maintenances/new']">
+        <mat-icon>add</mat-icon> Nouvelle Maintenance
+      </button>
+    </div>
+
+    <div *ngIf="loading" class="loading-container">
+      <mat-spinner diameter="40"></mat-spinner>
+    </div>
+
+    <div *ngIf="errorMessage" class="error-message">
+      {{ errorMessage }}
+    </div>
+
+    <table mat-table [dataSource]="maintenances" *ngIf="!loading && !errorMessage">
+      <!-- ID Column -->
+      <ng-container matColumnDef="id">
+        <th mat-header-cell *matHeaderCellDef> ID </th>
+        <td mat-cell *matCellDef="let maintenance"> {{maintenance.id}} </td>
+      </ng-container>
+
+      <!-- Machine Column -->
+      <ng-container matColumnDef="machine">
+        <th mat-header-cell *matHeaderCellDef> Machine </th>
+        <td mat-cell *matCellDef="let maintenance"> {{maintenance.machine}} </td>
+      </ng-container>
+
+      <!-- Technicien Column -->
+      <ng-container matColumnDef="technicien">
+        <th mat-header-cell *matHeaderCellDef> Technicien </th>
+        <td mat-cell *matCellDef="let maintenance"> {{maintenance.technicien}} </td>
+      </ng-container>
+
+      <!-- Date Column -->
+      <ng-container matColumnDef="date">
+        <th mat-header-cell *matHeaderCellDef> Date </th>
+        <td mat-cell *matCellDef="let maintenance"> {{maintenance.date | date:'dd/MM/yyyy'}} </td>
+      </ng-container>
+
+      <!-- Type Column -->
+      <ng-container matColumnDef="type">
+        <th mat-header-cell *matHeaderCellDef> Type </th>
+        <td mat-cell *matCellDef="let maintenance">
+          <span class="type-chip" [ngClass]="getTypeClass(maintenance.type)">
+            {{maintenance.type === 'PREVENTIVE' ? 'Préventive' : 'Corrective'}}
+          </span>
+        </td>
+      </ng-container>
+
+      <!-- Actions Column -->
+      <ng-container matColumnDef="actions">
+        <th mat-header-cell *matHeaderCellDef> Actions </th>
+        <td mat-cell *matCellDef="let maintenance">
+          <button mat-icon-button color="primary" (click)="editMaintenance(maintenance.id)">
+            <mat-icon>edit</mat-icon>
+          </button>
+          <button mat-icon-button color="warn" (click)="deleteMaintenance(maintenance.id)">
+            <mat-icon>delete</mat-icon>
+          </button>
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+    </table>
+
+    <div class="no-data" *ngIf="!loading && !errorMessage && maintenances.length === 0">
+      Aucune maintenance trouvée
+    </div>
+  </mat-card-content>
+</mat-card>

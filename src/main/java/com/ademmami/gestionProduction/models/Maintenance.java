@@ -29,7 +29,3 @@ public class Maintenance {
     @Enumerated(EnumType.STRING)
     private TypeMaintenance type;
 }
-
-enum TypeMaintenance {
-    PREVENTIVE, CORRECTIVE
-}

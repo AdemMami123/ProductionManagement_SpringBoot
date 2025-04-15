@@ -1,0 +1,99 @@
+.layout-container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+.toolbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 2;
+  box-shadow: 0 3px 5px -1px rgba(0,0,0,.2), 0 6px 10px 0 rgba(0,0,0,.14), 0 1px 18px 0 rgba(0,0,0,.12);
+}
+
+.toolbar-title {
+  margin-left: 8px;
+}
+
+.sidenav-container {
+  flex: 1;
+  margin-top: 64px; // Height of toolbar
+}
+
+.sidenav {
+  width: 250px;
+  background-color: #f8f9fa;
+  border-right: none;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.sidenav-header {
+  padding: 16px;
+  text-align: center;
+}
+
+.app-name {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 500;
+  color: #3f51b5;
+}
+
+.sidenav-content {
+  padding-top: 8px;
+}
+
+.nav-icon {
+  margin-right: 16px;
+  color: #6c757d;
+}
+
+.nav-text {
+  color: #333;
+}
+
+.active-link {
+  background-color: rgba(63, 81, 181, 0.1) !important;
+  border-left: 4px solid #3f51b5;
+
+  .nav-icon, .nav-text {
+    color: #3f51b5;
+  }
+}
+
+.sidenav-content-area {
+  transition: margin 0.3s ease;
+}
+
+.content-shifted {
+  margin-left: 250px;
+}
+
+.content-wrapper {
+  padding: 20px;
+  box-sizing: border-box;
+  height: 100%;
+  overflow-y: auto;
+}
+
+mat-list-item {
+  margin-bottom: 4px;
+  border-radius: 0 25px 25px 0;
+  transition: background-color 0.3s ease;
+
+  &:hover {
+    background-color: rgba(0, 0, 0, 0.04);
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .sidenav {
+    width: 200px;
+  }
+  
+  .content-shifted {
+    margin-left: 200px;
+  }
+}

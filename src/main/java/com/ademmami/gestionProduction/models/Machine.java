@@ -23,7 +23,3 @@ public class Machine {
 
     private LocalDate maintenanceProchaine;
 }
-
-enum EtatMachine {
-    EN_SERVICE, EN_PANNE, EN_MAINTENANCE
-}

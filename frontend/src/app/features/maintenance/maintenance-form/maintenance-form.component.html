@@ -1,0 +1,68 @@
+<mat-card>
+  <mat-card-header>
+    <mat-card-title>{{ isEditMode ? 'Modifier' : 'Ajouter' }} une maintenance</mat-card-title>
+  </mat-card-header>
+  
+  <mat-card-content>
+    <div *ngIf="loading" class="loading-container">
+      <mat-spinner diameter="40"></mat-spinner>
+    </div>
+
+    <div *ngIf="errorMessage" class="error-message">
+      {{ errorMessage }}
+    </div>
+
+    <form [formGroup]="maintenanceForm" (ngSubmit)="onSubmit()" *ngIf="!loading">
+      <mat-form-field appearance="fill" class="full-width">
+        <mat-label>Machine</mat-label>
+        <mat-select formControlName="machine" required>
+          <mat-option *ngFor="let machine of machines" [value]="machine.id">
+            {{ machine.nom }}
+          </mat-option>
+        </mat-select>
+        <mat-error *ngIf="maintenanceForm.get('machine')?.hasError('required')">
+          La machine est requise
+        </mat-error>
+      </mat-form-field>
+
+      <mat-form-field appearance="fill" class="full-width">
+        <mat-label>Technicien</mat-label>
+        <mat-select formControlName="technicien" required>
+          <mat-option *ngFor="let technicien of techniciens" [value]="technicien.id">
+            {{ technicien.nom }}
+          </mat-option>
+        </mat-select>
+        <mat-error *ngIf="maintenanceForm.get('technicien')?.hasError('required')">
+          Le technicien est requis
+        </mat-error>
+      </mat-form-field>
+
+      <mat-form-field appearance="fill" class="full-width">
+        <mat-label>Date</mat-label>
+        <input matInput [matDatepicker]="picker" formControlName="date" required>
+        <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+        <mat-datepicker #picker></mat-datepicker>
+        <mat-error *ngIf="maintenanceForm.get('date')?.hasError('required')">
+          La date est requise
+        </mat-error>
+      </mat-form-field>
+
+      <div class="radio-group">
+        <label class="radio-group-label">Type de maintenance :</label>
+        <mat-radio-group formControlName="type" required class="radio-buttons">
+          <mat-radio-button *ngFor="let type of maintenanceTypes" [value]="type.value">
+            {{ type.viewValue }}
+          </mat-radio-button>
+        </mat-radio-group>
+      </div>
+
+      <div class="button-container">
+        <button mat-raised-button color="primary" type="submit" [disabled]="maintenanceForm.invalid || submitLoading">
+          <span *ngIf="!submitLoading">Enregistrer</span>
+          <mat-spinner diameter="20" *ngIf="submitLoading"></mat-spinner>
+        </button>
+        <button mat-button type="button" (click)="cancel()">Annuler</button>
+      </div>
+    </form>
+  </mat-card-content>
+</mat-card>

@@ -1,0 +1,106 @@
+<mat-card>
+  <mat-card-header>
+    <mat-card-title>Liste des ordres de fabrication</mat-card-title>
+  </mat-card-header>
+  
+  <mat-card-content>
+    <div class="button-container">
+      <button mat-raised-button color="primary" [routerLink]="['/ordres-fabrication/new']">
+        <mat-icon>add</mat-icon> Nouvel Ordre de Fabrication
+      </button>
+    </div>
+
+    <div *ngIf="loading" class="loading-container">
+      <mat-spinner diameter="40"></mat-spinner>
+    </div>
+
+    <div *ngIf="errorMessage" class="error-message">
+      {{ errorMessage }}
+    </div>
+
+    <table mat-table [dataSource]="ordresFabrication" *ngIf="!loading && !errorMessage">
+      <!-- ID Column -->
+      <ng-container matColumnDef="id">
+        <th mat-header-cell *matHeaderCellDef> ID </th>
+        <td mat-cell *matCellDef="let ordre"> {{ordre.id}} </td>
+      </ng-container>
+
+      <!-- Produit Column -->
+      <ng-container matColumnDef="produit">
+        <th mat-header-cell *matHeaderCellDef> Produit </th>
+        <td mat-cell *matCellDef="let ordre"> {{ordre.produit?.nom || ordre.produit?.designation || 'Non défini'}} </td>
+      </ng-container>
+
+      <!-- Quantité Column -->
+      <ng-container matColumnDef="quantité">
+        <th mat-header-cell *matHeaderCellDef> Quantité </th>
+        <td mat-cell *matCellDef="let ordre"> {{ordre.quantite || 0}} </td>
+      </ng-container>
+
+      <!-- Date Column -->
+      <ng-container matColumnDef="date">
+        <th mat-header-cell *matHeaderCellDef> Date </th>
+        <td mat-cell *matCellDef="let ordre"> {{ordre.date | date:'dd/MM/yyyy'}} </td>
+      </ng-container>
+
+      <!-- Machine Column -->
+      <ng-container matColumnDef="machine">
+        <th mat-header-cell *matHeaderCellDef> Machine </th>
+        <td mat-cell *matCellDef="let ordre"> {{ordre.machine?.nom || ordre.machine?.designation || 'Non défini'}} </td>
+      </ng-container>
+
+      <!-- Statut Column -->
+      <ng-container matColumnDef="statut">
+        <th mat-header-cell *matHeaderCellDef> Statut </th>
+        <td mat-cell *matCellDef="let ordre">
+          <span class="statut-chip" [ngClass]="getStatutClass(ordre.statut)">
+            {{getStatutLabel(ordre.statut)}}
+          </span>
+        </td>
+      </ng-container>
+
+      <!-- Actions Column -->
+      <ng-container matColumnDef="actions">
+        <th mat-header-cell *matHeaderCellDef> Actions </th>
+        <td mat-cell *matCellDef="let ordre">
+          <button mat-icon-button color="primary" (click)="editOrdreFabrication(ordre.id)">
+            <mat-icon>edit</mat-icon>
+          </button>
+          
+          <button mat-icon-button [matMenuTriggerFor]="statutMenu">
+            <mat-icon>more_vert</mat-icon>
+          </button>
+          <mat-menu #statutMenu="matMenu">
+            <button mat-menu-item (click)="updateStatut(ordre.id, 'EN_ATTENTE')" 
+                    [disabled]="ordre.statut === 'EN_ATTENTE'">
+              <span>Mettre en attente</span>
+            </button>
+            <button mat-menu-item (click)="updateStatut(ordre.id, 'EN_COURS')"
+                    [disabled]="ordre.statut === 'EN_COURS'">
+              <span>Mettre en cours</span>
+            </button>
+            <button mat-menu-item (click)="updateStatut(ordre.id, 'TERMINE')"
+                    [disabled]="ordre.statut === 'TERMINE'">
+              <span>Terminer</span>
+            </button>
+            <button mat-menu-item (click)="updateStatut(ordre.id, 'ANNULE')"
+                    [disabled]="ordre.statut === 'ANNULE'">
+              <span>Annuler</span>
+            </button>
+          </mat-menu>
+          
+          <button mat-icon-button color="warn" (click)="deleteOrdreFabrication(ordre.id)">
+            <mat-icon>delete</mat-icon>
+          </button>
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+    </table>
+
+    <div class="no-data" *ngIf="!loading && !errorMessage && ordresFabrication.length === 0">
+      Aucun ordre de fabrication trouvé
+    </div>
+  </mat-card-content>
+</mat-card>
