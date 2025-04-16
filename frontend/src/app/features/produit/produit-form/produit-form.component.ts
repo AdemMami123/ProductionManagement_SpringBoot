@@ -7,6 +7,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
+import { HttpClient, HttpClientModule } from '@angular/common/http';
 
 @Component({
   selector: 'app-produit-form',
@@ -20,7 +21,8 @@ import { ActivatedRoute, Router, RouterModule } from '@angular/router';
     MatButtonModule,
     MatCardModule,
     MatProgressSpinnerModule,
-    RouterModule
+    RouterModule,
+    HttpClientModule
   ],
   templateUrl: './produit-form.component.html',
   styleUrls: ['./produit-form.component.scss']
@@ -36,12 +38,13 @@ export class ProduitFormComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     private route: ActivatedRoute,
-    private router: Router
+    private router: Router,
+    private http: HttpClient
   ) {}
 
   ngOnInit(): void {
     this.initForm();
-    
+
     this.route.params.subscribe(params => {
       if (params['id'] && params['id'] !== 'new') {
         this.isEditMode = true;
@@ -62,20 +65,17 @@ export class ProduitFormComponent implements OnInit {
 
   loadProduit(id: number): void {
     this.loading = true;
-    
-    // Simulate API call - will be replaced with actual HTTP request
-    setTimeout(() => {
-      const produit = {
-        id: id,
-        nom: 'Produit ' + id,
-        type: 'Type A',
-        stock: 100,
-        fournisseur: 'Fournisseur X'
-      };
-      
-      this.produitForm.patchValue(produit);
-      this.loading = false;
-    }, 1000);
+    this.http.get<any>(`http://localhost:8080/api/produits/${id}`).subscribe(
+      (produit) => {
+        this.produitForm.patchValue(produit);
+        this.loading = false;
+      },
+      (error) => {
+        this.errorMessage = 'Erreur lors du chargement du produit';
+        this.loading = false;
+        console.error(error);
+      }
+    );
   }
 
   onSubmit(): void {
@@ -85,13 +85,34 @@ export class ProduitFormComponent implements OnInit {
 
     this.submitLoading = true;
     const produitData = this.produitForm.value;
-    
-    // Simulate API call - will be replaced with actual HTTP request
-    setTimeout(() => {
-      console.log('Produit saved:', produitData);
-      this.submitLoading = false;
-      this.router.navigate(['/produits']);
-    }, 1000);
+
+    if (this.isEditMode && this.produitId) {
+      // Update existing product
+      this.http.put(`http://localhost:8080/api/produits/${this.produitId}`, produitData).subscribe(
+        () => {
+          this.submitLoading = false;
+          this.router.navigate(['/produits']);
+        },
+        error => {
+          this.submitLoading = false;
+          this.errorMessage = 'Erreur lors de la modification du produit';
+          console.error(error);
+        }
+      );
+    } else {
+      // Create new product
+      this.http.post('http://localhost:8080/api/produits', produitData).subscribe(
+        () => {
+          this.submitLoading = false;
+          this.router.navigate(['/produits']);
+        },
+        error => {
+          this.submitLoading = false;
+          this.errorMessage = 'Erreur lors de la création du produit';
+          console.error(error);
+        }
+      );
+    }
   }
 
   cancel(): void {

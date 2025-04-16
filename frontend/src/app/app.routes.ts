@@ -1,9 +1,15 @@
 import { Routes } from '@angular/router';
+import { ProduitListComponent } from './features/produit/produit-list/produit-list.component';
+import { ProduitEditComponent } from './features/produit/produit-edit/produit-edit.component';
 
 export const routes: Routes = [
   { 
     path: 'produits', 
-    loadComponent: () => import('./features/produit/produit-list/produit-list.component').then(m => m.ProduitListComponent)
+    component: ProduitListComponent
+  },
+  { 
+    path: 'produits/edit/:id', 
+    component: ProduitEditComponent
   },
   { 
     path: 'produits/new', 

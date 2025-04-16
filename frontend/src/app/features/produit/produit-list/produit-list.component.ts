@@ -1,11 +1,12 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
+import { RouterModule, Router } from '@angular/router';
 import { MatTableModule } from '@angular/material/table';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatCardModule } from '@angular/material/card';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { HttpClient, HttpClientModule } from '@angular/common/http';
 
 @Component({
   selector: 'app-produit-list',
@@ -17,7 +18,8 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
     MatButtonModule,
     MatIconModule,
     MatCardModule,
-    MatProgressSpinnerModule
+    MatProgressSpinnerModule,
+    HttpClientModule // Required for HTTP requests
   ],
   templateUrl: './produit-list.component.html',
   styleUrls: ['./produit-list.component.scss']
@@ -28,32 +30,44 @@ export class ProduitListComponent implements OnInit {
   loading = true;
   errorMessage: string | null = null;
 
-  constructor() {}
+  constructor(private http: HttpClient, private router: Router) {}
 
   ngOnInit(): void {
-    // This will be replaced with actual API service call
     this.fetchProduits();
   }
 
   fetchProduits(): void {
-    // Simulate API call - will be replaced with actual HTTP request
-    setTimeout(() => {
-      this.produits = [
-        { id: 1, nom: 'Produit 1', type: 'Type A', stock: 100, fournisseur: 'Fournisseur X' },
-        { id: 2, nom: 'Produit 2', type: 'Type B', stock: 200, fournisseur: 'Fournisseur Y' },
-
-      ];
-      this.loading = false;
-    }, 1000);
+    this.loading = true;
+    this.http.get<any[]>('http://localhost:8080/api/produits').subscribe(
+      (data) => {
+        this.produits = data;
+        this.loading = false;
+      },
+      (error) => {
+        console.error('Error fetching produits:', error);
+        this.errorMessage = 'Erreur lors du chargement des produits.';
+        this.loading = false;
+      }
+    );
   }
 
   editProduit(id: number): void {
-    console.log(`Edit produit with ID: ${id}`);
-    // Navigation will be implemented
+    console.log(`Navigating to edit produit with ID: ${id}`);
+    this.router.navigate(['/produits/edit', id]);
   }
 
   deleteProduit(id: number): void {
-    console.log(`Delete produit with ID: ${id}`);
-    // Delete functionality will be implemented
+    if (confirm('Êtes-vous sûr de vouloir supprimer ce produit?')) {
+      this.http.delete(`http://localhost:8080/api/produits/${id}`).subscribe(
+        () => {
+          console.log(`Produit with ID: ${id} has been deleted`);
+          this.fetchProduits(); // Refresh the list after deletion
+        },
+        (error) => {
+          console.error('Error deleting produit:', error);
+          this.errorMessage = 'Erreur lors de la suppression du produit.';
+        }
+      );
+    }
   }
 }

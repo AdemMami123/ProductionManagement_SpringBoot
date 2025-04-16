@@ -7,6 +7,38 @@ html, body {
   background-color: #f5f5f5;
 }
 
+/* Global table styles */
+.mat-mdc-table {
+  width: 100%;
+  background-color: #ffffff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.mat-mdc-header-row {
+  background-color: #f8f9fa;
+}
+
+.mat-mdc-header-cell {
+  color: black;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.mat-mdc-cell {
+  color: black;
+  font-weight: 400;
+  font-size: 14px;
+}
+
+.mat-mdc-row:hover {
+  background-color: #f5f5f5;
+}
+
+/* Card styling */
+.mat-mdc-card {
+  margin-bottom: 20px;
+}
+
 mat-card {
   margin-bottom: 20px;
   border-radius: 8px !important;
@@ -53,7 +85,7 @@ mat-card-content {
 // Improve table appearance
 table.mat-mdc-table {
   width: 100%;
-  background-color: white;
+  background-color: rgb(255, 255, 255);
   border-radius: 4px;
   overflow: hidden;
   box-shadow: 0 1px 3px rgba(0,0,0,0.1);
