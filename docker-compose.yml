@@ -1,0 +1,55 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: gestionprod-mysql
+    environment:
+      MYSQL_DATABASE: gestion_production
+      MYSQL_ROOT_PASSWORD: root
+    ports:
+      - "3307:3306"  # Changed from 3306:3306 to avoid permission issues
+    volumes:
+      - mysql-data:/var/lib/mysql
+    networks:
+      - gestionprod-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-proot"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build: .
+    container_name: gestionprod-backend
+    restart: always
+    depends_on:
+      mysql:
+        condition: service_healthy
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/gestion_production?createDatabaseIfNotExist=true
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: root
+      SERVER_PORT: 8080
+    ports:
+      - "8081:8080"  # Changed from 8080:8080 to avoid permission issues
+    networks:
+      - gestionprod-network
+
+  frontend:
+    build: ./frontend
+    container_name: gestionprod-frontend
+    restart: always
+    ports:
+      - "4200:80"  # Changed from 80:80 to avoid permission issues
+    depends_on:
+      - backend
+    networks:
+      - gestionprod-network
+
+networks:
+  gestionprod-network:
+    driver: bridge
+
+volumes:
+  mysql-data:
