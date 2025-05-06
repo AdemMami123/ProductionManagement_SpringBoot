@@ -10,6 +10,7 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 import { MatSelectModule } from '@angular/material/select';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
+import { HttpClient, HttpClientModule } from '@angular/common/http';
 
 @Component({
   selector: 'app-machine-form',
@@ -26,7 +27,8 @@ import { ActivatedRoute, Router, RouterModule } from '@angular/router';
     MatDatepickerModule,
     MatNativeDateModule,
     MatSelectModule,
-    RouterModule
+    RouterModule,
+    HttpClientModule
   ],
   templateUrl: './machine-form.component.html',
   styleUrls: ['./machine-form.component.scss']
@@ -47,12 +49,13 @@ export class MachineFormComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     private route: ActivatedRoute,
-    private router: Router
+    private router: Router,
+    private http: HttpClient
   ) {}
 
   ngOnInit(): void {
     this.initForm();
-    
+
     this.route.params.subscribe(params => {
       if (params['id'] && params['id'] !== 'new') {
         this.isEditMode = true;
@@ -72,19 +75,21 @@ export class MachineFormComponent implements OnInit {
 
   loadMachine(id: number): void {
     this.loading = true;
-    
-    // Simulate API call - will be replaced with actual HTTP request
-    setTimeout(() => {
-      const machine = {
-        id: id,
-        nom: 'Machine ' + id,
-        etat: 'EN_SERVICE',
-        maintenanceProchaine: new Date()
-      };
-      
-      this.machineForm.patchValue(machine);
-      this.loading = false;
-    }, 1000);
+    this.http.get<any>(`http://localhost:8080/api/machines/${id}`).subscribe(
+      (machine) => {
+        // Convert date string to Date object for the datepicker
+        if (machine.maintenanceProchaine) {
+          machine.maintenanceProchaine = new Date(machine.maintenanceProchaine);
+        }
+        this.machineForm.patchValue(machine);
+        this.loading = false;
+      },
+      (error) => {
+        this.errorMessage = 'Erreur lors du chargement de la machine';
+        this.loading = false;
+        console.error(error);
+      }
+    );
   }
 
   onSubmit(): void {
@@ -94,13 +99,34 @@ export class MachineFormComponent implements OnInit {
 
     this.submitLoading = true;
     const machineData = this.machineForm.value;
-    
-    // Simulate API call - will be replaced with actual HTTP request
-    setTimeout(() => {
-      console.log('Machine saved:', machineData);
-      this.submitLoading = false;
-      this.router.navigate(['/machines']);
-    }, 1000);
+
+    if (this.isEditMode && this.machineId) {
+      // Update existing machine
+      this.http.put(`http://localhost:8080/api/machines/${this.machineId}`, machineData).subscribe(
+        () => {
+          this.submitLoading = false;
+          this.router.navigate(['/machines']);
+        },
+        error => {
+          this.submitLoading = false;
+          this.errorMessage = 'Erreur lors de la modification de la machine';
+          console.error(error);
+        }
+      );
+    } else {
+      // Create new machine
+      this.http.post('http://localhost:8080/api/machines', machineData).subscribe(
+        () => {
+          this.submitLoading = false;
+          this.router.navigate(['/machines']);
+        },
+        error => {
+          this.submitLoading = false;
+          this.errorMessage = 'Erreur lors de la création de la machine';
+          console.error(error);
+        }
+      );
+    }
   }
 
   cancel(): void {

@@ -8,6 +8,7 @@ import { MatCardModule } from '@angular/material/card';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSelectModule } from '@angular/material/select';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
+import { HttpClient, HttpClientModule } from '@angular/common/http';
 
 @Component({
   selector: 'app-technicien-form',
@@ -22,7 +23,8 @@ import { ActivatedRoute, Router, RouterModule } from '@angular/router';
     MatCardModule,
     MatProgressSpinnerModule,
     MatSelectModule,
-    RouterModule
+    RouterModule,
+    HttpClientModule
   ],
   templateUrl: './technicien-form.component.html',
   styleUrls: ['./technicien-form.component.scss']
@@ -40,13 +42,14 @@ export class TechnicienFormComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     private route: ActivatedRoute,
-    private router: Router
+    private router: Router,
+    private http: HttpClient
   ) {}
 
   ngOnInit(): void {
     this.initForm();
     this.loadMachines();
-    
+
     this.route.params.subscribe(params => {
       if (params['id'] && params['id'] !== 'new') {
         this.isEditMode = true;
@@ -66,33 +69,31 @@ export class TechnicienFormComponent implements OnInit {
 
   loadMachines(): void {
     this.machinesLoading = true;
-    
-    // Simulate API call - will be replaced with actual HTTP request
-    setTimeout(() => {
-      this.machines = [
-        { id: 1, nom: 'Machine A' },
-        { id: 2, nom: 'Machine B' },
-        { id: 3, nom: 'Machine C' }
-      ];
-      this.machinesLoading = false;
-    }, 1000);
+    this.http.get<any[]>('http://localhost:8080/api/machines').subscribe(
+      (machines) => {
+        this.machines = machines;
+        this.machinesLoading = false;
+      },
+      (error) => {
+        console.error('Error loading machines:', error);
+        this.machinesLoading = false;
+      }
+    );
   }
 
   loadTechnicien(id: number): void {
     this.loading = true;
-    
-    // Simulate API call - will be replaced with actual HTTP request
-    setTimeout(() => {
-      const technicien = {
-        id: id,
-        nom: 'Technicien ' + id,
-        competences: 'Mécanique, Électronique',
-        machineAssignee: id % 2 === 0 ? 1 : null
-      };
-      
-      this.technicienForm.patchValue(technicien);
-      this.loading = false;
-    }, 1000);
+    this.http.get<any>(`http://localhost:8080/api/techniciens/${id}`).subscribe(
+      (technicien) => {
+        this.technicienForm.patchValue(technicien);
+        this.loading = false;
+      },
+      (error) => {
+        this.errorMessage = 'Erreur lors du chargement du technicien';
+        this.loading = false;
+        console.error(error);
+      }
+    );
   }
 
   onSubmit(): void {
@@ -102,13 +103,34 @@ export class TechnicienFormComponent implements OnInit {
 
     this.submitLoading = true;
     const technicienData = this.technicienForm.value;
-    
-    // Simulate API call - will be replaced with actual HTTP request
-    setTimeout(() => {
-      console.log('Technicien saved:', technicienData);
-      this.submitLoading = false;
-      this.router.navigate(['/techniciens']);
-    }, 1000);
+
+    if (this.isEditMode && this.technicienId) {
+      // Update existing technicien
+      this.http.put(`http://localhost:8080/api/techniciens/${this.technicienId}`, technicienData).subscribe(
+        () => {
+          this.submitLoading = false;
+          this.router.navigate(['/techniciens']);
+        },
+        error => {
+          this.submitLoading = false;
+          this.errorMessage = 'Erreur lors de la modification du technicien';
+          console.error(error);
+        }
+      );
+    } else {
+      // Create new technicien
+      this.http.post('http://localhost:8080/api/techniciens', technicienData).subscribe(
+        () => {
+          this.submitLoading = false;
+          this.router.navigate(['/techniciens']);
+        },
+        error => {
+          this.submitLoading = false;
+          this.errorMessage = 'Erreur lors de la création du technicien';
+          console.error(error);
+        }
+      );
+    }
   }
 
   cancel(): void {

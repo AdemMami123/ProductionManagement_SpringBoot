@@ -1,12 +1,13 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
+import { RouterModule, Router } from '@angular/router';
 import { MatTableModule } from '@angular/material/table';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatCardModule } from '@angular/material/card';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatChipsModule } from '@angular/material/chips';
+import { HttpClient, HttpClientModule } from '@angular/common/http';
 
 @Component({
   selector: 'app-maintenance-list',
@@ -19,7 +20,8 @@ import { MatChipsModule } from '@angular/material/chips';
     MatIconModule,
     MatCardModule,
     MatProgressSpinnerModule,
-    MatChipsModule
+    MatChipsModule,
+    HttpClientModule
   ],
   templateUrl: './maintenance-list.component.html',
   styleUrls: ['./maintenance-list.component.scss']
@@ -30,36 +32,51 @@ export class MaintenanceListComponent implements OnInit {
   loading = true;
   errorMessage: string | null = null;
 
-  constructor() {}
+  constructor(private http: HttpClient, private router: Router) {}
 
   ngOnInit(): void {
-    // Will be replaced with actual API service call
     this.fetchMaintenances();
   }
 
   fetchMaintenances(): void {
-    // Simulate API call - will be replaced with actual HTTP request
-    setTimeout(() => {
-      this.maintenances = [
-        { id: 1, machine: 'Machine A', technicien: 'Jean Dupont', date: '2023-11-15', type: 'PREVENTIVE' },
-        { id: 2, machine: 'Machine B', technicien: 'Marie Martin', date: '2023-11-20', type: 'CORRECTIVE' },
-        { id: 3, machine: 'Machine C', technicien: 'Pierre Durand', date: '2023-12-01', type: 'PREVENTIVE' }
-      ];
-      this.loading = false;
-    }, 1000);
+    this.loading = true;
+    this.http.get<any[]>('http://localhost:8080/api/maintenances').subscribe(
+      (data) => {
+        this.maintenances = data;
+        this.loading = false;
+      },
+      (error) => {
+        console.error('Error fetching maintenances:', error);
+        this.errorMessage = 'Erreur lors du chargement des maintenances.';
+        this.loading = false;
+      }
+    );
   }
 
   getTypeClass(type: string): string {
-    return type === 'PREVENTIVE' ? 'type-preventive' : 'type-corrective';
+    switch (type) {
+      case 'PREVENTIVE': return 'type-preventive';
+      case 'CORRECTIVE': return 'type-corrective';
+      default: return '';
+    }
   }
 
   editMaintenance(id: number): void {
-    console.log(`Edit maintenance with ID: ${id}`);
-    // Navigation will be implemented
+    this.router.navigate(['/maintenances/edit', id]);
   }
 
   deleteMaintenance(id: number): void {
-    console.log(`Delete maintenance with ID: ${id}`);
-    // Delete functionality will be implemented
+    if (confirm('Êtes-vous sûr de vouloir supprimer cette maintenance?')) {
+      this.http.delete(`http://localhost:8080/api/maintenances/${id}`).subscribe(
+        () => {
+          console.log(`Maintenance with ID: ${id} has been deleted`);
+          this.fetchMaintenances(); // Refresh the list after deletion
+        },
+        (error) => {
+          console.error('Error deleting maintenance:', error);
+          this.errorMessage = 'Erreur lors de la suppression de la maintenance.';
+        }
+      );
+    }
   }
 }

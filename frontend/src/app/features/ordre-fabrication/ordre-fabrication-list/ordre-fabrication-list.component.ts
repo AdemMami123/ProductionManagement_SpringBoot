@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
+import { RouterModule, Router } from '@angular/router';
 import { MatTableModule } from '@angular/material/table';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -8,6 +8,7 @@ import { MatCardModule } from '@angular/material/card';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatMenuModule } from '@angular/material/menu';
+import { HttpClient, HttpClientModule } from '@angular/common/http';
 
 @Component({
   selector: 'app-ordre-fabrication-list',
@@ -21,7 +22,8 @@ import { MatMenuModule } from '@angular/material/menu';
     MatCardModule,
     MatProgressSpinnerModule,
     MatChipsModule,
-    MatMenuModule
+    MatMenuModule,
+    HttpClientModule
   ],
   templateUrl: './ordre-fabrication-list.component.html',
   styleUrls: ['./ordre-fabrication-list.component.scss']
@@ -32,24 +34,25 @@ export class OrdreFabricationListComponent implements OnInit {
   loading = true;
   errorMessage: string | null = null;
 
-  constructor() {}
+  constructor(private http: HttpClient, private router: Router) {}
 
   ngOnInit(): void {
-    // Will be replaced with actual API service call
     this.fetchOrdresFabrication();
   }
 
   fetchOrdresFabrication(): void {
-    // Simulate API call - will be replaced with actual HTTP request
-    setTimeout(() => {
-      this.ordresFabrication = [
-        { id: 1, produit: 'Produit A', quantité: 100, date: '2023-11-20', machine: 'Machine A', statut: 'EN_ATTENTE' },
-        { id: 2, produit: 'Produit B', quantité: 50, date: '2023-11-25', machine: 'Machine B', statut: 'EN_COURS' },
-        { id: 3, produit: 'Produit C', quantité: 200, date: '2023-12-01', machine: 'Machine C', statut: 'TERMINE' },
-        { id: 4, produit: 'Produit D', quantité: 75, date: '2023-12-05', machine: 'Machine A', statut: 'ANNULE' }
-      ];
-      this.loading = false;
-    }, 1000);
+    this.loading = true;
+    this.http.get<any[]>('http://localhost:8080/api/ordres-fabrication').subscribe(
+      (data) => {
+        this.ordresFabrication = data;
+        this.loading = false;
+      },
+      (error) => {
+        console.error('Error fetching ordres de fabrication:', error);
+        this.errorMessage = 'Erreur lors du chargement des ordres de fabrication.';
+        this.loading = false;
+      }
+    );
   }
 
   getStatutClass(statut: string): string {
@@ -73,17 +76,34 @@ export class OrdreFabricationListComponent implements OnInit {
   }
 
   editOrdreFabrication(id: number): void {
-    console.log(`Edit ordre de fabrication with ID: ${id}`);
-    // Navigation will be implemented
+    this.router.navigate(['/ordres-fabrication/edit', id]);
   }
 
   deleteOrdreFabrication(id: number): void {
-    console.log(`Delete ordre de fabrication with ID: ${id}`);
-    // Delete functionality will be implemented
+    if (confirm('Êtes-vous sûr de vouloir supprimer cet ordre de fabrication?')) {
+      this.http.delete(`http://localhost:8080/api/ordres-fabrication/${id}`).subscribe(
+        () => {
+          console.log(`Ordre de fabrication with ID: ${id} has been deleted`);
+          this.fetchOrdresFabrication(); // Refresh the list after deletion
+        },
+        (error) => {
+          console.error('Error deleting ordre de fabrication:', error);
+          this.errorMessage = 'Erreur lors de la suppression de l\'ordre de fabrication.';
+        }
+      );
+    }
   }
 
   updateStatut(id: number, statut: string): void {
-    console.log(`Update statut for ordre de fabrication ID: ${id} to ${statut}`);
-    // Update functionality will be implemented
+    this.http.put(`http://localhost:8080/api/ordres-fabrication/${id}/status`, { status: statut }).subscribe(
+      () => {
+        console.log(`Statut of ordre de fabrication ID: ${id} updated to ${statut}`);
+        this.fetchOrdresFabrication(); // Refresh the list to show updated status
+      },
+      (error) => {
+        console.error('Error updating statut:', error);
+        this.errorMessage = 'Erreur lors de la mise à jour du statut.';
+      }
+    );
   }
 }

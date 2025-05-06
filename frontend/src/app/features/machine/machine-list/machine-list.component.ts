@@ -1,12 +1,13 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { MatTableModule } from '@angular/material/table';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatCardModule } from '@angular/material/card';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatChipsModule } from '@angular/material/chips';
+import { HttpClient, HttpClientModule } from '@angular/common/http';
 
 @Component({
   selector: 'app-machine-list',
@@ -19,7 +20,8 @@ import { MatChipsModule } from '@angular/material/chips';
     MatIconModule,
     MatCardModule,
     MatProgressSpinnerModule,
-    MatChipsModule
+    MatChipsModule,
+    HttpClientModule
   ],
   templateUrl: './machine-list.component.html',
   styleUrls: ['./machine-list.component.scss']
@@ -30,23 +32,25 @@ export class MachineListComponent implements OnInit {
   loading = true;
   errorMessage: string | null = null;
 
-  constructor() {}
+  constructor(private http: HttpClient, private router: Router) {}
 
   ngOnInit(): void {
-    // Will be replaced with actual API service call
     this.fetchMachines();
   }
 
   fetchMachines(): void {
-    // Simulate API call - will be replaced with actual HTTP request
-    setTimeout(() => {
-      this.machines = [
-        { id: 1, nom: 'Machine A', etat: 'EN_SERVICE', maintenanceProchaine: '2023-12-15' },
-        { id: 2, nom: 'Machine B', etat: 'EN_MAINTENANCE', maintenanceProchaine: '2023-11-20' },
-        { id: 3, nom: 'Machine C', etat: 'EN_PANNE', maintenanceProchaine: '2023-11-10' }
-      ];
-      this.loading = false;
-    }, 1000);
+    this.loading = true;
+    this.http.get<any[]>('http://localhost:8080/api/machines').subscribe(
+      (data) => {
+        this.machines = data;
+        this.loading = false;
+      },
+      (error) => {
+        console.error('Error fetching machines:', error);
+        this.errorMessage = 'Erreur lors du chargement des machines.';
+        this.loading = false;
+      }
+    );
   }
 
   getEtatClass(etat: string): string {
@@ -58,13 +62,31 @@ export class MachineListComponent implements OnInit {
     }
   }
 
+  getEtatLabel(etat: string): string {
+    switch (etat) {
+      case 'EN_SERVICE': return 'En service';
+      case 'EN_PANNE': return 'En panne';
+      case 'EN_MAINTENANCE': return 'En maintenance';
+      default: return etat;
+    }
+  }
+
   editMachine(id: number): void {
-    console.log(`Edit machine with ID: ${id}`);
-    // Navigation will be implemented
+    this.router.navigate(['/machines/edit', id]);
   }
 
   deleteMachine(id: number): void {
-    console.log(`Delete machine with ID: ${id}`);
-    // Delete functionality will be implemented
+    if (confirm('Êtes-vous sûr de vouloir supprimer cette machine?')) {
+      this.http.delete(`http://localhost:8080/api/machines/${id}`).subscribe(
+        () => {
+          console.log(`Machine with ID: ${id} has been deleted`);
+          this.fetchMachines(); // Refresh the list after deletion
+        },
+        (error) => {
+          console.error('Error deleting machine:', error);
+          this.errorMessage = 'Erreur lors de la suppression de la machine.';
+        }
+      );
+    }
   }
 }

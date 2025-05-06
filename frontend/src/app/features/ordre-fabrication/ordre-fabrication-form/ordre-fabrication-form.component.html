@@ -1,0 +1,82 @@
+<mat-card>
+  <mat-card-header>
+    <mat-card-title>{{ isEditMode ? 'Modifier' : 'Ajouter' }} un ordre de fabrication</mat-card-title>
+  </mat-card-header>
+
+  <mat-card-content>
+    <div *ngIf="loading" class="loading-container">
+      <mat-spinner diameter="40"></mat-spinner>
+    </div>
+
+    <div *ngIf="errorMessage" class="error-message">
+      {{ errorMessage }}
+    </div>
+
+    <form [formGroup]="ordreFabricationForm" (ngSubmit)="onSubmit()" *ngIf="!loading">
+      <mat-form-field appearance="fill" class="full-width">
+        <mat-label>Produit</mat-label>
+        <mat-select formControlName="produit" required>
+          <mat-option *ngFor="let produit of produits" [value]="produit.id">
+            {{ produit.nom }}
+          </mat-option>
+        </mat-select>
+        <mat-error *ngIf="ordreFabricationForm.get('produit')?.hasError('required')">
+          Le produit est requis
+        </mat-error>
+      </mat-form-field>
+
+      <mat-form-field appearance="fill" class="full-width">
+        <mat-label>Quantité</mat-label>
+        <input matInput type="number" formControlName="quantité" required>
+        <mat-error *ngIf="ordreFabricationForm.get('quantité')?.hasError('required')">
+          La quantité est requise
+        </mat-error>
+        <mat-error *ngIf="ordreFabricationForm.get('quantité')?.hasError('min')">
+          La quantité doit être supérieure à 0
+        </mat-error>
+      </mat-form-field>
+
+      <mat-form-field appearance="fill" class="full-width">
+        <mat-label>Date</mat-label>
+        <input matInput [matDatepicker]="picker" formControlName="date" required>
+        <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+        <mat-datepicker #picker></mat-datepicker>
+        <mat-error *ngIf="ordreFabricationForm.get('date')?.hasError('required')">
+          La date est requise
+        </mat-error>
+      </mat-form-field>
+
+      <mat-form-field appearance="fill" class="full-width">
+        <mat-label>Machine</mat-label>
+        <mat-select formControlName="machine" required>
+          <mat-option *ngFor="let machine of machines" [value]="machine.id">
+            {{ machine.nom }}
+          </mat-option>
+        </mat-select>
+        <mat-error *ngIf="ordreFabricationForm.get('machine')?.hasError('required')">
+          La machine est requise
+        </mat-error>
+      </mat-form-field>
+
+      <mat-form-field appearance="fill" class="full-width">
+        <mat-label>Statut</mat-label>
+        <mat-select formControlName="statut" required>
+          <mat-option *ngFor="let statut of statuts" [value]="statut.value">
+            {{ statut.viewValue }}
+          </mat-option>
+        </mat-select>
+        <mat-error *ngIf="ordreFabricationForm.get('statut')?.hasError('required')">
+          Le statut est requis
+        </mat-error>
+      </mat-form-field>
+
+      <div class="button-container">
+        <button mat-raised-button color="primary" type="submit" [disabled]="ordreFabricationForm.invalid || submitLoading">
+          <span *ngIf="!submitLoading">Enregistrer</span>
+          <mat-spinner diameter="20" *ngIf="submitLoading"></mat-spinner>
+        </button>
+        <button mat-button type="button" (click)="cancel()">Annuler</button>
+      </div>
+    </form>
+  </mat-card-content>
+</mat-card>
