@@ -2,7 +2,7 @@
   <mat-card-header>
     <mat-card-title>Liste des techniciens</mat-card-title>
   </mat-card-header>
-  
+
   <mat-card-content>
     <div class="button-container">
       <button mat-raised-button color="primary" [routerLink]="['/techniciens/new']">
@@ -34,15 +34,15 @@
       <!-- Compétences Column -->
       <ng-container matColumnDef="competences">
         <th mat-header-cell *matHeaderCellDef> Compétences </th>
-        <td mat-cell *matCellDef="let technicien"> {{technicien.competences}} </td>
+        <td mat-cell *matCellDef="let technicien"> {{technicien['compétences']}} </td>
       </ng-container>
 
       <!-- Machine Assignée Column -->
       <ng-container matColumnDef="machineAssignee">
         <th mat-header-cell *matHeaderCellDef> Machine assignée </th>
-        <td mat-cell *matCellDef="let technicien"> 
+        <td mat-cell *matCellDef="let technicien">
           <span *ngIf="technicien.machineAssignee" class="machine-chip">
-            {{technicien.machineAssignee}}
+            {{technicien.machineAssignee.nom || 'Machine #' + technicien.machineAssignee.id}}
           </span>
           <span *ngIf="!technicien.machineAssignee" class="no-machine">
             Non assigné

@@ -62,7 +62,7 @@ export class TechnicienFormComponent implements OnInit {
   initForm(): void {
     this.technicienForm = this.fb.group({
       nom: ['', [Validators.required]],
-      competences: ['', [Validators.required]],
+      compétences: ['', [Validators.required]],
       machineAssignee: [null]
     });
   }
@@ -102,7 +102,14 @@ export class TechnicienFormComponent implements OnInit {
     }
 
     this.submitLoading = true;
-    const technicienData = this.technicienForm.value;
+    const technicienData = {...this.technicienForm.value};
+
+    // Transform machineAssignee from ID to proper object format expected by backend
+    if (technicienData.machineAssignee) {
+      technicienData.machineAssignee = { id: technicienData.machineAssignee };
+    } else {
+      technicienData.machineAssignee = null;
+    }
 
     if (this.isEditMode && this.technicienId) {
       // Update existing technicien
