@@ -1,0 +1,92 @@
+stages:
+  - build
+  - test
+  - package
+  - deploy
+
+variables:
+  MAVEN_OPTS: "-Dmaven.repo.local=.m2/repository"
+
+cache:
+  paths:
+    - .m2/repository/
+    - frontend/node_modules/
+
+# Backend Jobs
+build-backend:
+  stage: build
+  image: maven:3.8.6-openjdk-17
+  script:
+    - mvn clean compile
+  only:
+    - main
+    - merge_requests
+
+test-backend:
+  stage: test
+  image: maven:3.8.6-openjdk-17
+  script:
+    - mvn test
+  only:
+    - main
+    - merge_requests
+
+package-backend:
+  stage: package
+  image: maven:3.8.6-openjdk-17
+  script:
+    - mvn package -DskipTests
+  artifacts:
+    paths:
+      - target/*.jar
+    expire_in: 1 week
+  only:
+    - main
+
+# Frontend Jobs
+build-frontend:
+  stage: build
+  image: node:18
+  script:
+    - cd frontend
+    - npm install
+    - npm run build
+  artifacts:
+    paths:
+      - frontend/dist/
+    expire_in: 1 week
+  only:
+    - main
+    - merge_requests
+
+test-frontend:
+  stage: test
+  image: node:18
+  script:
+    - cd frontend
+    - npm install
+    - npm run test -- --watch=false --browsers=ChromeHeadless
+  only:
+    - main
+    - merge_requests
+  allow_failure: true
+
+# Deployment
+deploy:
+  stage: deploy
+  image: docker/compose:latest
+  services:
+    - docker:dind
+  variables:
+    DOCKER_HOST: tcp://docker:2375
+    DOCKER_TLS_CERTDIR: ""
+  before_script:
+    - docker info
+  script:
+    - docker-compose build
+    - docker-compose up -d
+  environment:
+    name: production
+  only:
+    - main
+  when: manual
