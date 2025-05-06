@@ -28,13 +28,13 @@
       <!-- Machine Column -->
       <ng-container matColumnDef="machine">
         <th mat-header-cell *matHeaderCellDef> Machine </th>
-        <td mat-cell *matCellDef="let maintenance"> {{maintenance.machine}} </td>
+        <td mat-cell *matCellDef="let maintenance"> {{maintenance.machine?.nom || maintenance.machine?.model || 'N/A'}} </td>
       </ng-container>
 
       <!-- Technicien Column -->
       <ng-container matColumnDef="technicien">
         <th mat-header-cell *matHeaderCellDef> Technicien </th>
-        <td mat-cell *matCellDef="let maintenance"> {{maintenance.technicien}} </td>
+        <td mat-cell *matCellDef="let maintenance"> {{maintenance.technicien?.nom || maintenance.technicien?.prenom + ' ' + maintenance.technicien?.nom || 'N/A'}} </td>
       </ng-container>
 
       <!-- Date Column -->

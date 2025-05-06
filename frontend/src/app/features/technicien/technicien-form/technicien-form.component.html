@@ -2,7 +2,7 @@
   <mat-card-header>
     <mat-card-title>{{ isEditMode ? 'Modifier' : 'Ajouter' }} un technicien</mat-card-title>
   </mat-card-header>
-  
+
   <mat-card-content>
     <div *ngIf="loading" class="loading-container">
       <mat-spinner diameter="40"></mat-spinner>
@@ -37,7 +37,7 @@
             {{ machine.nom }}
           </mat-option>
         </mat-select>
-        <mat-progress-spinner *ngIf="machinesLoading" diameter="20" mode="indeterminate" 
+        <mat-progress-spinner *ngIf="machinesLoading" diameter="20" mode="indeterminate"
                               class="select-spinner"></mat-progress-spinner>
       </mat-form-field>
 

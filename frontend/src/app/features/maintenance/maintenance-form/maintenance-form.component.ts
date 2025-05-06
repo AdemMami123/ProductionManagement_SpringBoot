@@ -128,7 +128,15 @@ export class MaintenanceFormComponent implements OnInit {
     }
 
     this.submitLoading = true;
-    const maintenanceData = this.maintenanceForm.value;
+    const formValues = this.maintenanceForm.value;
+    
+    // Format the data correctly for the backend
+    const maintenanceData = {
+      machine: { id: formValues.machine },
+      technicien: { id: formValues.technicien },
+      date: formValues.date,
+      type: formValues.type
+    };
 
     if (this.isEditMode && this.maintenanceId) {
       // Update existing maintenance
