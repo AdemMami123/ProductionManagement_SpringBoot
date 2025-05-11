@@ -72,7 +72,7 @@ export class MachineListComponent implements OnInit {
   }
 
   editMachine(id: number): void {
-    this.router.navigate(['/machines/edit', id]);
+    this.router.navigate(['/machines', id]);
   }
 
   deleteMachine(id: number): void {

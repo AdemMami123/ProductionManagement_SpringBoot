@@ -76,7 +76,7 @@ export class OrdreFabricationListComponent implements OnInit {
   }
 
   editOrdreFabrication(id: number): void {
-    this.router.navigate(['/ordres-fabrication/edit', id]);
+    this.router.navigate(['/ordres-fabrication', id]);
   }
 
   deleteOrdreFabrication(id: number): void {

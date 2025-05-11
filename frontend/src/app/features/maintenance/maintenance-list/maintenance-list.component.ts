@@ -62,7 +62,7 @@ export class MaintenanceListComponent implements OnInit {
   }
 
   editMaintenance(id: number): void {
-    this.router.navigate(['/maintenances/edit', id]);
+    this.router.navigate(['/maintenances', id]);
   }
 
   deleteMaintenance(id: number): void {

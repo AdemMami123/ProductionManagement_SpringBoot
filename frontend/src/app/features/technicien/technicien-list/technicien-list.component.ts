@@ -122,7 +122,7 @@ export class TechnicienListComponent implements OnInit {
   }
 
   editTechnicien(id: number): void {
-    this.router.navigate(['/techniciens/edit', id]);
+    this.router.navigate(['/techniciens', id]);
   }
 
   deleteTechnicien(id: number): void {
