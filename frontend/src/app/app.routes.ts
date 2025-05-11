@@ -59,7 +59,14 @@ export const routes: Routes = [
     path: 'ordres-fabrication', 
     loadComponent: () => import('./features/ordre-fabrication/ordre-fabrication-list/ordre-fabrication-list.component').then(m => m.OrdreFabricationListComponent)
   },
-  
+  { 
+    path: 'ordres-fabrication/new', 
+    loadComponent: () => import('./features/ordre-fabrication/ordre-fabrication-form/ordre-fabrication-form.component').then(m => m.OrdreFabricationFormComponent)
+  },
+  { 
+    path: 'ordres-fabrication/:id', 
+    loadComponent: () => import('./features/ordre-fabrication/ordre-fabrication-form/ordre-fabrication-form.component').then(m => m.OrdreFabricationFormComponent)
+  },
   { 
     path: '', 
     redirectTo: '/produits', 

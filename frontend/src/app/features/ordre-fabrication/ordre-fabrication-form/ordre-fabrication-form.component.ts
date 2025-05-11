@@ -129,7 +129,16 @@ export class OrdreFabricationFormComponent implements OnInit {
     }
 
     this.submitLoading = true;
-    const ordreFabricationData = this.ordreFabricationForm.value;
+    const formValues = this.ordreFabricationForm.value;
+    
+    // Format the data correctly for the backend
+    const ordreFabricationData = {
+      produit: { id: formValues.produit },
+      quantité: formValues.quantité,
+      date: formValues.date,
+      machine: { id: formValues.machine },
+      statut: formValues.statut
+    };
 
     if (this.isEditMode && this.ordreFabricationId) {
       // Update existing ordre de fabrication

@@ -129,7 +129,7 @@ export class MaintenanceFormComponent implements OnInit {
 
     this.submitLoading = true;
     const formValues = this.maintenanceForm.value;
-    
+
     // Format the data correctly for the backend
     const maintenanceData = {
       machine: { id: formValues.machine },
