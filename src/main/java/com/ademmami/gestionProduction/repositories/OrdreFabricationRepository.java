@@ -6,5 +6,4 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface OrdreFabricationRepository extends JpaRepository<OrdreFabrication, Long> {
-    // You can add custom query methods here if needed
 }
